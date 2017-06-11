@@ -33,6 +33,16 @@ results <- fetch(allQuery)
 names(salarys)
 # 输出行数量*列数量
 dim(results)
+# 对数据进行处理,返回LIST
+salarys$SEX <- lapply(salarys$SEX, function(x) switch(x, FEMALE='女', MALE='男'))
+# 返回向量
+salarys$SEX <- c(salarys$SEX, recursive = TRUE)
+# 只选择部分记录，不能省略逗号
+salarys.female <- salarys[salarys$ID %% 2 == 0,]
+# 按性别分组
+salarys.sum <- tapply(salarys$SALARY, INDEX=salarys$SEX, FUN=sum)
+salarys.max <- by(salarys[c('SALARY')], INDICES = list(salarys$SEX), FUN=max)
+salarys.max <- aggregate(x=salarys[c('SALARY')], by = list(salarys$SEX, salarys$ID), FUN=max)
 # 关闭数据库链接
 dbDisconnect(conn)
 
